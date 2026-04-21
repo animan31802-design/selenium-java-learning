@@ -40,4 +40,36 @@ public class TestSeleniumTest {
 
         driver.quit();
     }
+
+    @Test
+    public void loginStandardTest() {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://www.saucedemo.com/");
+        var userNameField = driver.findElement(By.id("user-name"));
+        var passwordField = driver.findElement(By.name("password"));
+
+        userNameField.sendKeys("standard_user");
+        passwordField.sendKeys("secret_sauce");
+
+        driver.findElement(By.cssSelector("input#login-button")).click();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+        try {
+            var testElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("app_logo")));
+        }catch (TimeoutException e){
+            Assert.fail("Element not visible → Login failed");
+        }
+
+        String currentUrl = driver.getCurrentUrl();
+        Assert.assertTrue(currentUrl.contains("inventory"),
+                "URL does not contain inventory → Login failed");
+
+        String pageTitle = driver.findElement(By.xpath("//span[text()='Products']")).getText();
+        Assert.assertTrue(pageTitle.equalsIgnoreCase("products"),
+                "Login failed: Title is incorrect");
+
+        System.out.println("Login Successful");
+
+        driver.quit();
+    }
 }
